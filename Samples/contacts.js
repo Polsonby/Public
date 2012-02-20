@@ -1,5 +1,13 @@
 var contacts = {
 
+	init : function(settings) {
+		contacts.hideAllOptions();
+	},
+	
+	hideAllOptions : function () {
+		$('.hide').hide();
+	},
+	
 	sendPropertyForm : function(e) {
 		e.preventDefault();
 		$this = $(this);
