@@ -1,1 +1,19 @@
 Polsonby
+
+Sample files to show coding style
+
+Amazon S3 synchronization script
+This was to copy files from our account at Amazon S3 that users had uploaded there directly from a bunch of sources, down to our local box for backup. It was designed to scale to synch many thousands of files at regular intervals, using background processes and a simple queuing solution done in MySQL. We used the MD5 hash of each file that Amazon provides to see if the current file up there had changed from the local copy; the hashes for the local files were stored in MySQL so it all ran quite quickly
+
+S3.php - this class is a wrapper I wrote for the third-party class which provides the basic underlying functionality for talking to S3, by Dominic Schonknecht. We evaluated the S3 support in Zend framework and found one really wrong-headed design error in it that would have resulted in hundreds of thousands of additional calls to Amazon or required us to hack ZF, which I wanted to avoid at all costs, so used Dominic's tool instead - worked really well
+
+amazonS3Sync.php - one of several CLI scripts for the solution, this one run every so often by cron
+
+
+XML Feed reader and image resizer
+It takes an XML feed and caches it locally. It takes the image referenced in the feed and creates local copies at the right image sizes for the thumbnails and so on. This version only caches the first page; in the next version I was going to make it cache the subsequent pages as well. The caching was to avoid problems with performance and perhaps availability, relying on a 3rd party provider
+
+feed.php - this was intended to be used by another web designer so spent some care on API so it was easy for him to drop into some simple PHP pages he was building. 
+
+api.txt - API documentation for the above
+
