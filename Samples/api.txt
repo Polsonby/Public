@@ -1,0 +1,114 @@
+File structure
+
+The files specifically used for the provider integration are as follows:
+
+•	/provider/
+o	/provider/check_provider_feed.php
+o	/provider/update_provider_feed.php
+o	/provider/feed.php
+
+
+/provider/check_provider_feed.php
+This is the script called hourly by cron. It initiates a connection to the script at Provider, gets XML for the ten most recent issues in a given region, checks the XML loads properly, and then saves the XML to disk as feed.xml. 
+
+/provider/update_provider_feed.php
+This is the script accessed directly by the production editor once a new issue has gone live. It does almost exactly the same as check_provider_feed but outputs confirmation to the screen.
+
+/provider/feed.xml, /provider/feed.xml.bak
+This file contains the actual XML loaded by the archive page when it first loads. When the file is updated, the previous version is moved to ~.bak as a safety net, though this file is never used.
+
+/provider/feed.php
+This contains the class providerFeed which contains all the functionality required to read the XML (or access the Provider feed script directly for search or older pages) and output the interface elements
+
+/includes/pages/subscriber-archive.php
+This is the view script which contains the static content describing how to access the Provider editions as well as dynamic elements (covers, list of ten issues) linking to the Provider editions
+
+Instantiating the feed class and API
+
+Instantiation
+
+// provider integration - requires class file
+require 'feed.php';
+
+// capture or initialise variables ($p = current page)
+$p = (isset($_GET['p'])) ? (int) $_GET['p'] : 1;
+$search = (isset($_GET['search'])) ? $_GET['search'] : NULL;
+
+$feed = new providerFeed('xxx', $p);
+
+At this point, the variable $feed contains a reference to an instance of the providerFeed class which is now populated with all the information about the issues based on the publication code and page number it was given, and offers functions that can be called to access the various UI elements
+
+It contains up to 10 issues in an array. You can access data for individual issues by passing their array index (0-9) to one of these functions
+
+They are called like this:
+
+<?php echo $feed->getIssueHeadline(0); ?>
+
+Note that none of the functions writes to the browser directly; they all return their value when called and so must be explicitly echo’ed. You can use the abbreviated echo if you wish:
+
+<?= $feed->getIssueHeadline(0); ?>
+
+API
+
+getIssueHeadline($issue)
+-	requires the relevant issue index (0-9) as $issue
+-	returns the issue headline (e.g. Issue 713)
+
+getIssueLink($issue, $str)
+-	requires the relevant issue index (0-9) as $issue
+-	requires a string or image tag to display as $str
+(e.g. “Read online”)
+-	returns the string or image tag wrapped in a link to the Provider edition
+( e.g. <a href="http://providermedia.com/1Q4a89534d92a22012.cde" target="_blank">Read online</a>)
+
+getIssueURL($issue)
+-	requires the relevant issue index (0-9) as $issue
+-	returns the URL to the Provider edition
+(e.g. http://providermedia.com/1Q4a89534d92a22012.cde)
+
+getIssueDescription($issue)
+-	requires the relevant issue index (0-9) as $issue
+-	returns the issue description
+(e.g. “The summer that never was: will we ever trust the Met Office again? PLUS: The most trusted man in America; Is the Barmy Army spoiling cricket?; Ruby wax on being an ugly duckling”)
+
+getIssueDate($issue)
+-	requires the relevant issue index (0-9) as $issue
+-	returns the formatted issue date
+(e.g. 8 August 2009)
+
+getIssueCoverURL($issue[, $thumb])
+-	requires the relevant issue index (0-9) as $issue
+-	optional thumb parameter (true or false), otherwise gives medium size 
+-	returns the URL for the cover image JPEG
+(e.g. http://admin.providermedia.com//pages/xxx_080809/images/med/xxx_001.jpeg)
+
+getIssueCover($issue[, $width][, $alt][, $thumb])
+-	requires the relevant issue index (0-9) as $issue
+-	optional parameter defines the width, otherwise 250
+-	optional alt parameter, otherwise empty
+-	optional thumb parameter (true or false), otherwise gives medium size 
+-	returns the image tag for the cover image 
+(e.g. <img src="http://providermedia.com//pages/xxx_080809/images/med/xxx_080809_0001.jpeg" alt="" width="250" border="0">)
+Note that the image width is hard-coded in feed.php and may be changed if so desired. The height is not set, so the browser will scale the image in proportion. 
+
+getIssueCount()
+-	returns the number of issues loaded for this instance. Usually 10 but could be fewer.
+
+getStatusIndicator()
+-	returns the current page and number of pages
+(e.g. Page 1 of 2)
+
+getPreviousPageLink($str)
+-	requires a string or image tag to display as a link to previous issues
+-	returns the string with the appropriate link, preserving the search if any
+(e.g. <a href="/issue-archive/?search=Adobe&p=2">Previous</a>)
+NOTE: Currently it outputs the string or image without the link if there is no previous page.
+
+getNextPageLink($str)
+-	requires a string or image tag to display as a link to subsequent issues
+-	returns the string with the appropriate link, preserving the search if any
+(e.g. <a href="/issue-archive/?search=Adobe&p=2">Next</a>)
+NOTE: Currently it outputs the string or image without the link if there is no next page.
+
+
+x
