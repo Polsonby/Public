@@ -17,3 +17,7 @@ feed.php - this was intended to be used by another web designer so spent some ca
 
 api.txt - API documentation for the above
 
+jQuery code
+I hate disorganised jQuery code, which can easily turn into a vast pile of anonymous functions and event handlers. Using object literals helps to keep it tidy and organised. Anonymous functions are kept to an absolute minimum so as to make navigating the code simpler and to encourage modular code
+
+contacts.js - this is an edited version of a real file, trimmed for compactness
